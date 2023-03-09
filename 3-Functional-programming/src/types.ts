@@ -25,3 +25,8 @@ export interface ExecutorUser extends User {
   possibilities: Array<Demand>;
 }
 
+export type ResultItem = {
+  name: string,
+  distance: number,
+  reward: number
+}

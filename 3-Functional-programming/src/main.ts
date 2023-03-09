@@ -1,12 +1,14 @@
-import { Either, fromPromise, ap, right, getOrElse, flatten } from './fp/either';
+import { Either, fromPromise, ap, right, getOrElse, flatten, fold, left } from './fp/either';
 import { pipe } from './fp/utils';
 import { fetchClient, fetchExecutor } from './fetching';
-import { ClientUser, ExecutorUser } from './types';
+import { ClientUser, ExecutorUser, ResultItem } from './types';
+import { isSome } from './fp/maybe';
+import { distance, transClientResponse } from './utils';
 
 type Response<R> = Promise<Either<string, R>>
 
 const getExecutor = (): Response<ExecutorUser> => fromPromise(fetchExecutor());
-const getClients = (): Response<Array<ClientUser>> => fromPromise(fetchClient());
+const getClients = (): Response<Array<ClientUser>> => fromPromise(transClientResponse(fetchClient()));
 
 export enum SortBy {
   distance = 'distance',
@@ -14,7 +16,27 @@ export enum SortBy {
 }
 
 export const show = (sortBy: SortBy) => (clients: Array<ClientUser>) => (executor: ExecutorUser): Either<string, string> => {
+  const getListOfClients = fold(
+    () => left(`This executor cannot meet the demands of any client!`),
+    (data: ResultItem[]) => data.length === clients.length ? 
+      right(`This executor meets all demands of all clients!`) :
+      right(`This executor meets the demands of only ${data.length} out of ${clients.length} clients
 
+Available clients sorted by ${sortBy === SortBy.reward ? 'highest reward' : 'distance to executor' }:${data.map((client) => `\nname: ${client.name}, distance: ${client.distance}, reward: ${client.reward}`).join('')}`
+  ));
+
+  const filteredClients = clients.filter(client => isSome(client.demands) ? client.demands.value.some(demand=> executor.possibilities.includes(demand)) : true);
+  const filteredClientsWithDistances = filteredClients.map(client => (
+    {
+      name: client.name,
+      distance: distance(client.position, executor.position), 
+      reward: client.reward
+    }
+  ))
+
+  const sortedFilteredClientsWithDistances = filteredClientsWithDistances.sort((a, b) => sortBy === SortBy.reward ? b[sortBy] - a[sortBy] : a[sortBy] - b[sortBy]);
+
+  return getListOfClients(sortedFilteredClientsWithDistances.length > 0 ? right(sortedFilteredClientsWithDistances): left(''));
 };
 
 export const main = (sortBy: SortBy): Promise<string> => (
