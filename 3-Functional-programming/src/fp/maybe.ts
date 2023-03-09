@@ -27,7 +27,7 @@ export const none: Readonly<None> = {
 /**
  * Create a Maybe instance form the value. If value(T) is nullable(null or undefined), returns None, otherwise it returns Some<T>
  */
-export const fromNullable = <T>(value: T) => ();
+export const fromNullable = <T>(value: T) => !value ? none : some(value);
 
 /**
  * Get the value from Some, or returns the result of onNone
@@ -46,4 +46,5 @@ export const fold = <T, R>(
   onNone: () => R,
   onSome: (v: T) => R,
 ) => (optional: Maybe<T>): R => (
+  optional._tag === 'Some' ? onSome(optional.value) : onNone()
 );
