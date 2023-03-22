@@ -1,4 +1,4 @@
-import { Shipment, ShipmentState } from "./Shipment";
+import { Shipment, ShipmentDecorator, ShipmentInfoType, ShipmentState } from "./Shipment";
 
 const stateFromClient: ShipmentState = {
   shipmentID: 0,
@@ -31,16 +31,38 @@ const stateFromClient4: ShipmentState = {
   shipmentID: 0,
   weight: 200,
   fromAddress: 'A Street 11.',
-  fromZipCode: 'abdef',
+  fromZipCode: '5bdef',
   toAddress: 'B Street 11.',
   toZipCode: '12345'
 }
 
+const shipmentInfo: ShipmentInfoType = {
+  'Fragile': true,
+  'Do Not Leave': false,
+  'Return Receipt Requested': false
+}
+
+const shipmentInfo2: ShipmentInfoType = {
+  'Fragile': false,
+  'Do Not Leave': true,
+  'Return Receipt Requested': true
+}
+
+const shipmentInfo3: ShipmentInfoType = {
+  'Fragile': true,
+  'Do Not Leave': true,
+  'Return Receipt Requested': true
+}
+
 const shipment = Shipment.getInstance(stateFromClient);
-console.log(shipment.ship());
+const shipmentDecorator = new ShipmentDecorator(shipment, shipmentInfo);
+console.log(shipmentDecorator.ship());
 const shipment2 = Shipment.getInstance(stateFromClient2);
-console.log(shipment2.ship());
+const shipmentDecorator2 = new ShipmentDecorator(shipment2, shipmentInfo2);
+console.log(shipmentDecorator2.ship());
 const shipment3 = Shipment.getInstance(stateFromClient3);
-console.log(shipment3.ship());
+const shipmentDecorator3 = new ShipmentDecorator(shipment3, shipmentInfo3);
+console.log(shipmentDecorator3.ship());
 const shipment4 = Shipment.getInstance(stateFromClient4);
-console.log(shipment4.ship());
+const shipmentDecorator4 = new ShipmentDecorator(shipment4, shipmentInfo);
+console.log(shipmentDecorator4.ship());
