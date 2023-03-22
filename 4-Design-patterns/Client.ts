@@ -20,7 +20,7 @@ const stateFromClient2: ShipmentState = {
 
 const stateFromClient3: ShipmentState = {
   shipmentID: 5,
-  weight: 74,
+  weight: 174,
   fromAddress: 'A Street 15.',
   fromZipCode: '93254',
   toAddress: 'B Street 51.',
@@ -29,7 +29,7 @@ const stateFromClient3: ShipmentState = {
 
 const stateFromClient4: ShipmentState = {
   shipmentID: 0,
-  weight: 21,
+  weight: 200,
   fromAddress: 'A Street 11.',
   fromZipCode: 'abdef',
   toAddress: 'B Street 11.',

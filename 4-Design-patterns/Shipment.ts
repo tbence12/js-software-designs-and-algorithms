@@ -9,12 +9,17 @@ export type ShipmentState = {
   toZipCode: string;
 }
 
+export enum ShipmentType {
+  Letter = 'Letter',
+  Package = 'Package',
+  Oversized = 'Oversized'
+}
+
 export class Shipment {
   private static shipment: Shipment;
   private static nextShipmentID = 1;
   private static state: ShipmentState;
-  private rateCentsPerOunce = 39;
-  private lengthOfZipCode = 5;
+  private static type: ShipmentType;
   
   private constructor() {}
 
@@ -24,6 +29,7 @@ export class Shipment {
     } 
 
     Shipment.shipment.setState(state);
+    Shipment.shipment.setType(state.weight);
 
     return Shipment.shipment;
   }
@@ -34,7 +40,7 @@ export class Shipment {
 
   private setState(state: ShipmentState): void {
     const {shipmentID, fromZipCode, toZipCode} = state;
-    const zipCodeLength = this.lengthOfZipCode;
+    const zipCodeLength = 5;
 
     if(fromZipCode.length !== zipCodeLength || toZipCode.length !== zipCodeLength) {
       throw new Error(`The ZipCode must contain ${zipCodeLength} characters`);
@@ -47,23 +53,35 @@ export class Shipment {
     Shipment.state = state;
   }
 
+  private setType(weight: number): void {
+    if(weight <= 15) {
+      Shipment.type = ShipmentType.Letter;
+    } 
+    else if(weight <= 160) {
+      Shipment.type = ShipmentType.Package;
+    }
+    else {
+      Shipment.type = ShipmentType.Oversized;
+    }
+  }
+
   private getShipper(zipCode: string): Shipper {
     const zipCodeFirstChar = zipCode.charAt(0);
 
     if(zipCodeFirstChar <= '9' && zipCodeFirstChar >= '7') {
-      return new PacificParcelShipper();
+      return new PacificParcelShipper(Shipment.type);
     }
 
     if(zipCodeFirstChar <= '6' && zipCodeFirstChar >= '4') {
-      return new ChicagoSprintShipper();
+      return new ChicagoSprintShipper(Shipment.type);
     }
 
-    return new AirEastShipper();
+    return new AirEastShipper(Shipment.type);
   }
 
   public ship(): string {
     const {shipmentID, weight, fromAddress, fromZipCode, toAddress, toZipCode} = Shipment.state;
     const shipper: Shipper = this.getShipper(fromZipCode);
-    return `[SHIPMENT INFO] - ID: ${shipmentID} | FROM: ${fromZipCode}, ${fromAddress} --> TO: ${toZipCode}, ${toAddress} | COST: ${shipper.getCost(weight)} cents`;
+    return `[SHIPMENT INFO] - ID: ${shipmentID} | FROM: ${fromZipCode}, ${fromAddress} --> TO: ${toZipCode}, ${toAddress} | COST: ${shipper.getCost(weight).toFixed(1)} dollars`;
   }
 }
