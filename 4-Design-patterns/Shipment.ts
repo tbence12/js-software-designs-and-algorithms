@@ -1,3 +1,5 @@
+import { AirEastShipper, ChicagoSprintShipper, PacificParcelShipper, Shipper } from "./Shipper";
+
 export type ShipmentState = {
   shipmentID: number;
   weight: number;
@@ -45,8 +47,23 @@ export class Shipment {
     Shipment.state = state;
   }
 
+  private getShipper(zipCode: string): Shipper {
+    const zipCodeFirstChar = zipCode.charAt(0);
+
+    if(zipCodeFirstChar <= '9' && zipCodeFirstChar >= '7') {
+      return new PacificParcelShipper();
+    }
+
+    if(zipCodeFirstChar <= '6' && zipCodeFirstChar >= '4') {
+      return new ChicagoSprintShipper();
+    }
+
+    return new AirEastShipper();
+  }
+
   public ship(): string {
     const {shipmentID, weight, fromAddress, fromZipCode, toAddress, toZipCode} = Shipment.state;
-    return `[SHIPMENT INFO] - ID: ${shipmentID} | FROM: ${fromZipCode}, ${fromAddress} --> TO: ${toZipCode}, ${toAddress} | COST: ${weight * this.rateCentsPerOunce} cents`;
+    const shipper: Shipper = this.getShipper(fromZipCode);
+    return `[SHIPMENT INFO] - ID: ${shipmentID} | FROM: ${fromZipCode}, ${fromAddress} --> TO: ${toZipCode}, ${toAddress} | COST: ${shipper.getCost(weight)} cents`;
   }
 }
