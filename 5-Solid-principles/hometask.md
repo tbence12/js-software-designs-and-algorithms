@@ -6,12 +6,8 @@
 
    | Principle                        | Examples |
    | -------------------------------- | -------- |
-   | Single Responsibility Principle  |          |
-   | Open / Closed Principle          |          |
-   | Liskov Substitution Principle    |          |
-   | Interface Seggregation Principle |          |
-   | Dependency Inversion Principle   |          |
-
-2. Violations of SOLID and Other Principles
-
-   Try to find **at least 1 (one)** violations of each SOLID principle in the project you have chosen for Problem 1 and document it. Additionally, you can describe other (DRY/KISS/YAGNI/etc.) violations.
+   | Single Responsibility Principle  | https://github.com/react-native-webview/react-native-webview/blob/master/windows/ReactNativeWebView/ReactWebView.h#L16 , file ReactWebView.h:16-41 |
+   | Open / Closed Principle          | https://github.com/react-native-webview/react-native-webview/blob/master/windows/ReactNativeWebView/ReactWebView2.cpp#L70 , file ReactWebView2.cpp:70-81 |
+   | Liskov Substitution Principle    | https://github.com/react-native-webview/react-native-webview/blob/master/windows/ReactNativeWebView/ReactWebViewManager.h#L11 , file ReactWebViewManager.h:11-52 |
+   | Interface Seggregation Principle | https://github.com/react-native-webview/react-native-webview/blob/master/src/WebViewTypes.ts#L42 , file WebViewTypes.ts:42-54 |
+   | Dependency Inversion Principle   | https://github.com/react-native-webview/react-native-webview/blob/master/windows/ReactNativeWebView/ReactWebView2Manager.h#L14, file ReactWebView2Manager.h:14-55 |
