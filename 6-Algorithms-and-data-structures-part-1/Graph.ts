@@ -78,13 +78,74 @@ interface Path {
 
 interface Dijkstra<T> {
   findShortestPath(vertex1: T, vertex2: T): Path;
-  findAllShortestPaths(vertex: T): Record<string, Path>;
+  // findAllShortestPaths(vertex: T): Record<string, Path>;
+  findAllShortestPaths(vertex: T): object;
 }
+
+type Distances = { [key: string]: number | string };
 
 class DijkstraAlgorithms implements Dijkstra<Vertex> {
   constructor(private graph: Graph) {
     this.graph = graph;
   }
+  private dijkstra(start: Vertex) {
+    const INFINITY = 'Infinity';
+    const baseGraph = this.graph.adjacencyList;
+    const startKey = start.key;
+    const distances: Distances = {};
+    const visitedKeys: string[] = [];
+    const remainingVertexKeys: string[] = [];
+
+    for(const vertexKey in baseGraph) {
+      distances[vertexKey] = INFINITY;
+      remainingVertexKeys.push(vertexKey);
+    }
+
+    distances[startKey] = 0;
+
+    while(remainingVertexKeys.length > 0) {
+      const shortestKey: string | null = this.shortestDistanceKey(distances, remainingVertexKeys);
+      if (!shortestKey) {
+        break;
+      }
+      
+      const index = remainingVertexKeys.indexOf(shortestKey);
+      remainingVertexKeys.splice(index, 1);
+      const shortestKeyNeighbors: { [key: string]: number } = baseGraph[shortestKey];
+
+      for(const neighborKey in shortestKeyNeighbors) {
+        let alt: number;
+        if(remainingVertexKeys.includes(neighborKey)) {
+          if(distances[shortestKey] === INFINITY) {
+            alt = shortestKeyNeighbors[neighborKey];
+          } else {
+            alt = shortestKeyNeighbors[neighborKey] + +distances[shortestKey];
+          }
+
+          if(distances[neighborKey] === INFINITY || alt < Number(distances[neighborKey])) {
+            distances[neighborKey] = alt;
+            visitedKeys.push(shortestKey);
+          }
+        }
+      }
+    }
+
+    return { path: visitedKeys, distance: distances };
+  }
+
+  private shortestDistanceKey(distances: Distances, remainingKeys: string[]): string | null {
+    let shortest: string | null = null;
+    
+    for (let key in distances) {
+      let currentIsShorter =
+        shortest === null || distances[key] < distances[shortest];
+            
+      if (currentIsShorter && remainingKeys.includes(key)) {
+        shortest = key;
+      }
+    }
+    return shortest;
+  };
 
   findShortestPath(vertex1: Vertex, vertex2: Vertex): Path {
     const start = vertex1.key;
@@ -120,7 +181,8 @@ class DijkstraAlgorithms implements Dijkstra<Vertex> {
     return { path: visited, distance: distances[end] };
   }
 
-  findAllShortestPaths(vertex: Vertex): Record<string, Path> {
+  findAllShortestPaths(vertex: Vertex): object {
+    /*
     const result: Record<string, Path> = {}
     for(const vert in this.graph) {
       if(vert !== vertex.key) {
@@ -129,6 +191,8 @@ class DijkstraAlgorithms implements Dijkstra<Vertex> {
     }
 
     return result;
+    */
+    return this.dijkstra(vertex);
   }
 }
 
@@ -138,7 +202,8 @@ const dijkstra: Dijkstra<Vertex> = new DijkstraAlgorithms(graph);
 // dijkstra.findShortestPath(vertex1, vertex5); // { path: [], distance: Infinity }
 // dijkstra.findShortestPath(vertex1, vertex1); // { path: ['1'], distance: 0 }
 
-// dijkstra.findAllShortestPaths(vertex4);
+const result = dijkstra.findAllShortestPaths(vertex4);
+console.log('dijk res: ', JSON.stringify(result));
 /*
   {
     '1': { path: ['4', '1'], distance: 3 },
