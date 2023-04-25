@@ -61,13 +61,13 @@ class JobRunner {
   }
 }
 
-const job1 = new Job("Job 1", 3);
-const job2 = new Job("Job 2", 1);
-const job3 = new Job("Job 3", 2);
-
+const numberOfJobs = 10001;
 const jobRunner = new JobRunner();
-jobRunner.addJob(job1);
-jobRunner.addJob(job2);
-jobRunner.addJob(job3);
+
+for(let i = 0; i < numberOfJobs; i++) {
+  const priority = Math.floor(Math.random() * numberOfJobs);
+  console.log(`Job ${i} priority: ${priority}`);
+  jobRunner.addJob(new Job(`Job ${i}`, priority));
+}
 
 jobRunner.runJobs();
